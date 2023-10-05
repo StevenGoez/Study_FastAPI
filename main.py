@@ -7,9 +7,6 @@ app = FastAPI()
 app.include_router(userRouter)
 app.include_router(addressRouter)
 
-# @app.get("/")
-# def welcome_page():
-#     return{"Welcome": "welcome please change the URL to: http://127.0.0.1:8000/docs"}
 
 
 

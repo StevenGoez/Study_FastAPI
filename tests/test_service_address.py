@@ -1,7 +1,7 @@
 import pytest
 from fastapi import HTTPException
 
-from src.address.models.address import Address
+from src.address.models.address import Address, AddressCreate
 from src.address.services.address import validate_address_create, create_address_instance
 
 # Datos de prueba
@@ -52,12 +52,23 @@ def test_create_address_instance():
     assert address_instance.zip == address_create.zip
     assert address_instance.country == address_create.country
 
-@pytest.mark.xfail
+
+
+
 def test_create_address_instance_with_invalid_data():
-    invalid_address_create = Address(**invalid_address_data)
+    invalid_address_data = {
+        "address_1": "",
+        "address_2": "",
+        "city": "City",
+        "state": "State",
+        "zip": "12345",
+        "country": "Country",
+        "email": ""
+    }
+
     address_id = 1
     try:
-        create_address_instance(invalid_address_create, address_id)
+        create_address_instance(AddressCreate(**invalid_address_data), address_id)
     except HTTPException as exc:
         assert exc.status_code == 400
         assert exc.detail == "address_1 cannot be empty"

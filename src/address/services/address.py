@@ -24,10 +24,9 @@ def validate_address_create(address_create: Address):
     ):
         raise HTTPException(status_code=400, detail="Please provide valid data")
 
-
 def create_address_instance(address_create: Address, address_id: int):
     if not address_create.address_1.strip():
-        return "address_1 cannot be empty"
+        raise HTTPException(status_code=400, detail="address_1 cannot be empty")
 
     return Address(
         address_id=address_id,
@@ -38,4 +37,3 @@ def create_address_instance(address_create: Address, address_id: int):
         zip=address_create.zip,
         country=address_create.country
     )
-

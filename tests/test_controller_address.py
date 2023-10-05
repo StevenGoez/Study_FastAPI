@@ -13,7 +13,6 @@ def test_get_addresses_empty():
     assert response.json() == {"detail": "No addresses found"}
 
 
-
 def test_get_addresses_with_data():
     # Agrega direcciones ficticias a addresses_db
     address_data = {
