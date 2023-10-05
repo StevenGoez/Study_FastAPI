@@ -2,10 +2,10 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException, Query
 
-from src.address.services.address import get_next_address_id
+#from src.address.services.address import get_next_address_id
 from src.databaseSimulation.databases import users_db
 from src.user.models.user import User, UserCreate
-from src.user.services.user import get_next_user_id, valid_email
+from src.user.services.user import get_next_user_id, valid_email, validate_user_create, associate_address_ids
 
 userRouter=APIRouter()
 
@@ -34,30 +34,6 @@ async def create_user(user_create: UserCreate):
     users_db.append(user)
 
     return user
-
-
-def validate_user_create(user_create: UserCreate):
-    if any(u.email == user_create.email for u in users_db):
-        raise HTTPException(status_code=400, detail="Email already registered")
-
-    if (
-        not user_create.first_name.strip() or
-        not user_create.last_name.strip() or
-        not user_create.email.strip() or
-        not user_create.password.strip() or
-        user_create.first_name == "string" or
-        user_create.last_name == "string" or
-        user_create.email == "string"
-    ):
-        raise HTTPException(status_code=400, detail="Please provide valid data")
-
-    if not valid_email(user_create.email):
-        raise HTTPException(status_code=400, detail="Provide a valid email (e.g., example@domain.com or example@domain.org)")
-
-def associate_address_ids(addresses):
-    for address in addresses:
-        address.address_id = get_next_address_id()
-
 
 # Ruta para obtener usuarios filtrados por país
 @userRouter.get("/users-by-country/", response_model=List[User])
