@@ -1,11 +1,9 @@
 from typing import List
-
 from fastapi import APIRouter, HTTPException, Query
-
-#from src.address.services.address import get_next_address_id
 from src.databaseSimulation.databases import users_db
 from src.user.models.user import User, UserCreate
-from src.user.services.user import get_next_user_id, valid_email, validate_user_create, associate_address_ids
+from src.user.services.user import valid_email, validate_user_create, associate_address_ids, get_next_id, \
+    is_valid_password
 
 userRouter=APIRouter()
 
@@ -20,8 +18,12 @@ async def get_users():
 async def create_user(user_create: UserCreate):
     validate_user_create(user_create)  # Llama a la función de validación
 
-    next_user_id = get_next_user_id()
+    next_user_id = get_next_id()
     associate_address_ids(user_create.addresses)  # Asocia IDs de direcciones
+
+    if not is_valid_password(user_create.password):
+        raise HTTPException(status_code=400,
+                            detail="The password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.")
 
     user = User(
         user_id=next_user_id,

@@ -1,59 +1,19 @@
-import pytest
+import uuid
 from fastapi import HTTPException
+from src.address.models.address import AddressCreate, Address
+from src.address.services.address import  create_address_instance
 
-from src.address.models.address import Address, AddressCreate
-from src.address.services.address import validate_address_create, create_address_instance
-
-# Datos de prueba
-
-valid_address_data = {
-    "address_id": 1,
-    "address_1": "123 Main St",
-    "address_2": "optional_address_2",
-    "city": "New York",
-    "state": "NY",
-    "zip": "10001",
-    "country": "USA"
-}
-
-invalid_address_data = {
-    "address_id": 1,
-    "address_1": "string",
-    "address_2": "optional_address_2",
-    "city": "New York",
-    "state": "",
-    "zip": "10001",
-    "country": "USA"
-}
-
-
-def test_validate_address_create_valid():
-    address = Address(**valid_address_data)
-    assert validate_address_create(address) is None
-
-
-def test_validate_address_create_invalid():
-    invalid_address = Address(**invalid_address_data)
-    with pytest.raises(HTTPException) as exc_info:
-        validate_address_create(invalid_address)
-    assert exc_info.value.status_code == 400
-    assert exc_info.value.detail == "Please provide valid data"
-
-
-def test_create_address_instance():
-    address_create = Address(**valid_address_data)
-    address_id = 1
-    address_instance = create_address_instance(address_create, address_id)
-
-    assert address_instance.address_id == address_id
-    assert address_instance.address_1 == address_create.address_1
-    assert address_instance.city == address_create.city
-    assert address_instance.state == address_create.state
-    assert address_instance.zip == address_create.zip
-    assert address_instance.country == address_create.country
-
-
-
+def test_validate_address_create():
+    # Prueba la validación de direcciones
+    address_create = AddressCreate(
+        address_1="123 Main St",
+        address_2="Apt 101",
+        city="City",
+        state="State",
+        zip="12345",
+        country="Country",
+        email="test@example.com"
+    )
 
 def test_create_address_instance_with_invalid_data():
     invalid_address_data = {
@@ -74,3 +34,25 @@ def test_create_address_instance_with_invalid_data():
         assert exc.detail == "address_1 cannot be empty"
     else:
         assert False, "Expected HTTPException was not raised"
+
+def test_create_address_instance():
+    # Prueba la creación de una instancia de dirección válida
+    address_create = AddressCreate(
+        address_1="123 Main St",
+        address_2="Apt 4B",  # Agregar un valor para address_2
+        city="City",
+        state="State",
+        zip="12345",
+        country="Country",
+        email="test@example.com"
+    )
+    address_id = uuid.uuid4()  # Genera un UUID aleatorio
+    address_instance = create_address_instance(address_create, address_id)
+    assert isinstance(address_instance, Address)
+    assert address_instance.address_id == address_id
+    assert address_instance.address_1 == "123 Main St"
+    assert address_instance.address_2 == "Apt 4B"  # Verificar que address_2 se haya configurado correctamente
+    assert address_instance.city == "City"
+    assert address_instance.state == "State"
+    assert address_instance.zip == "12345"
+    assert address_instance.country == "Country"

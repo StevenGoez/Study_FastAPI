@@ -1,16 +1,11 @@
+import re
+import uuid
 from fastapi import HTTPException
-
-from src.address.services.address import get_next_address_id
 from src.databaseSimulation.databases import users_db
 from src.user.models.user import UserCreate
 
-user_id_counter = 0
-
-# Función para obtener el próximo user_id y address_id
-def get_next_user_id():
-    global user_id_counter
-    user_id_counter += 1
-    return user_id_counter
+def get_next_id():
+    return uuid.uuid4()
 
 # Función para validar el formato del correo electrónico
 def valid_email(email):
@@ -50,7 +45,11 @@ def validate_user_create(user_create: UserCreate):
 
 def associate_address_ids(addresses):
     for idx, address in enumerate(addresses):
-        address["address_id"] = get_next_address_id()
+        address[idx] = get_next_id()
+
+def is_valid_password(password):
+    pattern = r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@/#$%^&*()_+{}|:"<>?~]).*$'
+    return bool(re.match(pattern, password))
 
 
 

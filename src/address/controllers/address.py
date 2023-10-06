@@ -1,11 +1,9 @@
 from typing import List
-
 from fastapi import APIRouter, HTTPException
-
 from src.address.models.address import Address, AddressCreate
-from src.address.services.address import get_next_address_id, create_address_instance, validate_address_create
+from src.address.services.address import create_address_instance, validate_address_create
 from src.databaseSimulation.databases import addresses_db
-from src.user.services.user import get_user_by_email
+from src.user.services.user import get_user_by_email, get_next_id
 
 addressRouter=APIRouter()
 
@@ -25,7 +23,7 @@ async def create_address(email: str, address_create: Address):
     if user is None:
         raise HTTPException(status_code=404, detail="User with provided email does not exist")
 
-    next_address_id = get_next_address_id()
+    next_address_id = get_next_id()
     address = create_address_instance(address_create, next_address_id)
 
     addresses_db.append(address)

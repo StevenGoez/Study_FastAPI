@@ -1,4 +1,4 @@
-from ...address.models.address import Address
+from uuid import UUID
 from pydantic import BaseModel
 from typing import List
 
@@ -7,11 +7,11 @@ class UserCreate(BaseModel):
     last_name: str
     email: str
     password: str
-    addresses: List[Address] = []
+    addresses: List[UUID] = []
 
 class User(BaseModel):
-    user_id: int
+    user_id: UUID
     first_name: str
     last_name: str
     email: str
-    addresses: List[Address] = []
+    addresses: List[UUID] = []

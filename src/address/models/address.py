@@ -1,3 +1,4 @@
+from uuid import UUID
 from pydantic import BaseModel
 
 class AddressCreate(BaseModel):
@@ -10,7 +11,7 @@ class AddressCreate(BaseModel):
     email: str
 
 class Address(BaseModel):
-    address_id: int
+    address_id: UUID
     address_1: str
     address_2: str
     city: str

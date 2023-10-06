@@ -1,48 +1,56 @@
-# Fixture de ejemplo para usuarios en users_db
+from unittest.mock import Mock
 import pytest
 from fastapi import HTTPException
-
+from src.databaseSimulation.databases import users_db
 from src.user.models.user import UserCreate
-from src.user.services.user import get_next_user_id, valid_email, get_user_by_email, validate_user_create, \
-    associate_address_ids
+from src.user.services.user import get_next_id, valid_email, get_user_by_email, validate_user_create, is_valid_password
 
-
-
-@pytest.fixture
-def example_users():
-    return [
-        UserCreate(first_name="John", last_name="Doe", email="johndoe@example.com", password="password"),
-        UserCreate(first_name="Alice", last_name="Smith", email="alice@example.com", password="password"),
-    ]
-
-
-
-def test_get_next_user_id():
-    assert get_next_user_id() == 1
-    assert get_next_user_id() == 2
+def test_get_next_id():
+    # Prueba la generación de IDs únicos
+    id_1 = get_next_id()
+    id_2 = get_next_id()
+    assert id_1 != id_2
 
 def test_valid_email():
-    assert valid_email("example@example.com") is True
-    assert valid_email("invalid-email") is False
+    # Prueba la validación de correos electrónicos
+    assert valid_email("test@example.com")
+    assert valid_email("test@example.org")
+    assert not valid_email("invalid_email")
+    assert not valid_email("test@example")
 
-@pytest.mark.xfail
-def test_get_user_by_email(example_users):
-    user = get_user_by_email("johndoe@example.com")
-    assert user is not None
-    assert user.first_name == "John"
+def test_get_user_by_email():
+    # Configurar datos de prueba
+    user_mock = Mock()
+    user_mock.email = "test@example.com"
+    users_db.append(user_mock)  # Agregar el usuario mock a la lista mock de users_db
 
-    user = get_user_by_email("nonexistent@example.com")
-    assert user is None
+    # Prueba la búsqueda exitosa
+    user = get_user_by_email("test@example.com")
+    assert user == user_mock
+def test_validate_user_create():
+    # Prueba la validación exitosa
+    user_create = UserCreate(
+        first_name="John",
+        last_name="Doe",
+        email="john@example.com",
+        password="P@ssw0rd",
+    )
+    validate_user_create(user_create)
 
+    # Prueba cuando falta el campo email
+    user_create.email = ""
+    with pytest.raises(HTTPException):
+        validate_user_create(user_create)
 
-def test_validate_user_create(example_users):
-    with pytest.raises(HTTPException) as exc_info:
-        validate_user_create(UserCreate(first_name="string", last_name="Doe", email="johndoe@example.com", password="password"))
-    assert exc_info.value.status_code == 400
+    # Prueba cuando el email es inválido
+    user_create.email = "invalid_email"
+    with pytest.raises(HTTPException):
+        validate_user_create(user_create)
 
-
-def test_associate_address_ids():
-    addresses = [{"address_id": 0}, {"address_id": 0}]
-    associate_address_ids(addresses)
-    assert addresses[0]["address_id"] == 1
-    assert addresses[1]["address_id"] == 2
+def test_is_valid_password():
+    # Prueba la validación de contraseñas
+    assert is_valid_password("P@ssw0rd")
+    assert not is_valid_password("password123")
+    assert not is_valid_password("P@ssw")
+    assert not is_valid_password("12345678")
+    assert not is_valid_password("!@#$%^&*()_")

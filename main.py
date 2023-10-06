@@ -22,13 +22,3 @@ app.include_router(addressRouter)
 
 
 
-
-
-
-
-
-
-
-
-
-
