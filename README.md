@@ -1,4 +1,4 @@
-# Prueba_Tecnica_FastAPI
+# Study_FastAPI
 
 The elaboration of this test serves to assess the abilities and proficiency 
 of the applicants in using the tool.
