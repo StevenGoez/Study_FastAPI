@@ -37,7 +37,4 @@ Once you run the project using the uvicorn command, it will open on the local ho
 
 3. Filter Users by Country: This route requires providing a country as a parameter, and it will search for users with that country in their address.
 
-## Contact
 
-- Steven Goez: steven.goez@gmail.com
-- WhatsApp: +57 3004947487
